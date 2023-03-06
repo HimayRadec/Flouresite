@@ -383,10 +383,10 @@ GameObject:
   - component: {fileID: 975545210}
   - component: {fileID: 975545209}
   - component: {fileID: 975545208}
-  - component: {fileID: 975545212}
   - component: {fileID: 975545213}
+  - component: {fileID: 975545214}
   m_Layer: 0
-  m_Name: Player
+  m_Name: First Person Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -472,31 +472,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &975545212
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 975545206}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2cd7ebe2d477c964e82a7c34366b3e85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  input_Movement: {x: 0, y: 0}
-  input_View: {x: 0, y: 0}
-  cameraHolder: {fileID: 570967003}
-  playerSettings:
-    ViewXSensitivity: 0
-    ViewYSensitivity: 0
-    ViewXInverted: 0
-    ViewYInverted: 0
-    WalkingForwardSpeed: 0
-    WalkingStrafeSpeed: 0
-    WalkingBackwardSpeed: 0
-  viewClampYmin: -70
-  viewClampYmax: 80
 --- !u!143 &975545213
 CharacterController:
   m_ObjectHideFlags: 0
@@ -515,6 +490,31 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &975545214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 975545206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69a81b346a9fc444793e0347d4d99efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  input_Movement: {x: 0, y: 0}
+  input_View: {x: 0, y: 0}
+  cameraHolder: {fileID: 755849234}
+  playerSettings:
+    ViewXSensitivity: 100
+    ViewYSensitivity: 100
+    ViewXInverted: 0
+    ViewYInverted: 0
+    WalkingForwardSpeed: 8
+    WalkingStrafeSpeed: 5
+    WalkingBackwardSpeed: 4
+  viewClampYmin: -70
+  viewClampYmax: 80
 --- !u!1 &1868418631
 GameObject:
   m_ObjectHideFlags: 0
