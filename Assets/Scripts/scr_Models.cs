@@ -25,4 +25,5 @@ public static class scr_Models
         public float WalkingBackwardSpeed; // 4
     }
     #endregion
+
 }

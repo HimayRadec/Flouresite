@@ -18,7 +18,7 @@ using static scr_Models;
  * scr_models - for the player settings
  * DefaultInput - Input controller class script using unity's input system 
  * 
- * 
+ * NOTES
  */
 
 public class scr_CharacterController : MonoBehaviour
@@ -38,12 +38,17 @@ public class scr_CharacterController : MonoBehaviour
     [Header("References")]
     public Transform cameraHolder; // Should reference main camera empty parent object
 
-    [Header("Settings")]
-    public PlayerSettingsModel playerSettings; // Creates an object from "scr_Models"
+    [Header("Settings")] // Refer to "scr_Models"
+    public PlayerSettingsModel playerSettings; // Creates an object from a class declared in "scr_Models"
 
     [Header("View Clamping")]
     public float viewClampYmin = -70; // -70
     public float viewClampYmax = 80; // 80
+
+    [Header("Gravity")]
+    public float gravityAmount;
+    public float gravityMin;
+    public float playerGravity;
 
     private void Awake()
     {
@@ -64,13 +69,11 @@ public class scr_CharacterController : MonoBehaviour
     {
         
     }
-
     void Update()
     {
         CalculateView();
         CalculateMovement();
     }
-
     private void CalculateView()
     {
         newCharacterRotation.y += playerSettings.ViewXSensitivity * (playerSettings.ViewXInverted ? -input_View.x : input_View.x) * Time.deltaTime;
@@ -81,18 +84,29 @@ public class scr_CharacterController : MonoBehaviour
 
         cameraHolder.localRotation = Quaternion.Euler(newCameraRotation);
     }
-
     private void CalculateMovement()
     {
         var verticalSpeed = playerSettings.WalkingForwardSpeed * input_Movement.y * Time.deltaTime;
         var horizonstalSpeed = playerSettings.WalkingStrafeSpeed * input_Movement.x * Time.deltaTime;
         var newMovementSpeed = new Vector3(horizonstalSpeed, 0, verticalSpeed);
 
-        // Moves character according to camera direction   
-        newMovementSpeed = transform.TransformDirection(newMovementSpeed);
+        
+        newMovementSpeed = transform.TransformDirection(newMovementSpeed); // Moves character according to camera direction   
 
         characterController.Move(newMovementSpeed);
 
+        // Gravity
 
+        if (playerGravity > gravityMin)
+        {
+            playerGravity -= gravityAmount * Time.deltaTime;
+
+        }
+
+        if (playerGravity < -1 && characterController.isGrounded)
+        {
+            playerGravity = -1;
+        }
+          
     }
 }
