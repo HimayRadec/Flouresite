@@ -70,6 +70,8 @@ public class scr_CharacterController : MonoBehaviour
     public Vector3 stanceCapsuleCenterVelocity; // ? capsule center transition time
     private float stanceCapsuleHeightVelocity; // ? capsule height transition time 
 
+    private bool isSprinting;
+
 
     private void Awake()
     {
@@ -81,6 +83,7 @@ public class scr_CharacterController : MonoBehaviour
         defaultInput.Character.Jump.performed += e => Jump();
         defaultInput.Character.Crouch.performed += e => Crouch();
         defaultInput.Character.Prone.performed += e => Prone();
+        defaultInput.Character.Sprint.performed += e => ToggleSprint();
 
         defaultInput.Enable();
 
@@ -176,8 +179,14 @@ public class scr_CharacterController : MonoBehaviour
     }
     private void Jump()
     {
-        if (!characterController.isGrounded)
+        if (!characterController.isGrounded || playerStance == PlayerStance.Prone) // TODO: make it so that if you are proned/crouched and try to jump you stand up
         {
+            return;
+        }
+
+        if (playerStance == PlayerStance.Crouch)
+        {
+            playerStance = PlayerStance.Stand;
             return;
         }
 
@@ -186,9 +195,9 @@ public class scr_CharacterController : MonoBehaviour
     }
     private void Crouch()
     {
-        if (playerStance == PlayerStance.Crouch)
+        if (playerStance == PlayerStance.Crouch) 
         {
-            if (StanceCheck(playerStandStance.StanceCollider.height))
+            if (StanceCheck(playerStandStance.StanceCollider.height)) // crouch to stand not viable
             {
                 return;
             }
@@ -197,7 +206,7 @@ public class scr_CharacterController : MonoBehaviour
             return;
         }
 
-        if (StanceCheck(playerCrouchStance.StanceCollider.height))
+        if (StanceCheck(playerCrouchStance.StanceCollider.height)) // prone to crouch not viable
         {
             return;
         }
@@ -211,10 +220,16 @@ public class scr_CharacterController : MonoBehaviour
     }
     private bool StanceCheck(float stanceCheckHeight)
     {
+        // Checks if the stance will collide
         var start = new Vector3(feetTransform.position.x, feetTransform.position.y + stanceCheckErrorMargin + characterController.radius, feetTransform.position.z);
         var end = new Vector3(feetTransform.position.x, feetTransform.position.y - stanceCheckErrorMargin - characterController.radius + stanceCheckHeight, feetTransform.position.z);
         
         return Physics.CheckCapsule(start, end, characterController.radius, playerMask);
+    }
+    private void ToggleSprint()
+    {
+        isSprinting = !isSprinting;
+
     }
 }
 
