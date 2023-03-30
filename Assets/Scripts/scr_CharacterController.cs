@@ -6,7 +6,7 @@ using static scr_Models;
 
 /* Developed By Himay
  * First Edit: March 3 2023
- * Last Edit: March 3 2023
+ * Last Edit: March 29 2023
  * 
  * Other Resources:
  * - FUELLED BY CAFFEINE: https://www.youtube.com/playlist?list=PLW3-6V9UKVh2T0wIqYWC1qvuCk2LNSG5c
@@ -20,6 +20,8 @@ using static scr_Models;
  * 
  * NOTES
  */
+
+//TODO: Simplify jumping mechanics
 
 public class scr_CharacterController : MonoBehaviour
 {
@@ -36,7 +38,7 @@ public class scr_CharacterController : MonoBehaviour
     private Vector3 newCharacterRotation;
 
     [Header("References")]
-    public Transform cameraHolder; // Should reference main camera empty parent object
+    public Transform cameraHolder; // Should reference main camera parent 
 
     [Header("Settings")] // Refer to "scr_Models"
     public PlayerSettingsModel playerSettings; // Creates an object from a class declared in "scr_Models"
@@ -48,7 +50,20 @@ public class scr_CharacterController : MonoBehaviour
     [Header("Gravity")]
     public float gravityAmount;
     public float gravityMin;
-    public float playerGravity;
+    private float playerGravity;
+
+
+    public Vector3 jumpingForce;
+    public Vector3 jumpingForceVelocity;
+
+    [Header("Stance")]
+    public PlayerStance playerStance;
+    public float cameraStandHeight;
+    public float cameraCrouchHeight;
+    public float cameraProneHeight;
+
+    private float cameraHeight;
+    private float cameraHeightVelocity;
 
     private void Awake()
     {
@@ -56,6 +71,7 @@ public class scr_CharacterController : MonoBehaviour
 
         defaultInput.Character.Movement.performed += e => input_Movement = e.ReadValue<Vector2>();
         defaultInput.Character.View.performed += e => input_View = e.ReadValue<Vector2>();
+        defaultInput.Character.Jump.performed += e => Jump();
 
         defaultInput.Enable();
 
@@ -63,6 +79,8 @@ public class scr_CharacterController : MonoBehaviour
         newCharacterRotation = transform.localRotation.eulerAngles;
 
         characterController = GetComponent<CharacterController>();
+
+        cameraHeight = cameraHolder.localPosition.y;
 
     }
     void Start()
@@ -73,6 +91,7 @@ public class scr_CharacterController : MonoBehaviour
     {
         CalculateView();
         CalculateMovement();
+        CalculateJump();
     }
     private void CalculateView()
     {
@@ -88,12 +107,10 @@ public class scr_CharacterController : MonoBehaviour
     {
         var verticalSpeed = playerSettings.WalkingForwardSpeed * input_Movement.y * Time.deltaTime;
         var horizonstalSpeed = playerSettings.WalkingStrafeSpeed * input_Movement.x * Time.deltaTime;
-        var newMovementSpeed = new Vector3(horizonstalSpeed, 0, verticalSpeed);
 
-        
+        var newMovementSpeed = new Vector3(horizonstalSpeed, 0, verticalSpeed);
         newMovementSpeed = transform.TransformDirection(newMovementSpeed); // Moves character according to camera direction   
 
-        characterController.Move(newMovementSpeed);
 
         // Gravity
 
@@ -103,10 +120,33 @@ public class scr_CharacterController : MonoBehaviour
 
         }
 
-        if (playerGravity < -1 && characterController.isGrounded)
+
+        if (playerGravity < -0.1f && characterController.isGrounded)
         {
-            playerGravity = -1;
+            playerGravity = -0.1f;
         }
-          
+
+        newMovementSpeed.y += playerGravity;
+        newMovementSpeed += jumpingForce * Time.deltaTime;
+
+
+        characterController.Move(newMovementSpeed);
+
+    }
+
+    private void CalculateJump()
+    {
+        jumpingForce = Vector3.SmoothDamp(jumpingForce, Vector3.zero, ref jumpingForceVelocity, playerSettings.JumpingFalloff);
+    }
+
+    private void Jump()
+    {
+        if (!characterController.isGrounded)
+        {
+            return;
+        }
+
+        jumpingForce = Vector3.up * playerSettings.JumpingHeight;
+        playerGravity = 0;
     }
 }
