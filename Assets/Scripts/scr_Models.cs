@@ -7,6 +7,13 @@ public static class scr_Models
 {
     #region - Player -
 
+    public enum PlayerStance
+    {
+        Stand,
+        Crouch,
+        Prone
+    }
+
     // Serializing a class makes all its properties editable in the unity editor
     [Serializable]
     public class PlayerSettingsModel
@@ -28,6 +35,13 @@ public static class scr_Models
         public float JumpingHeight;
         public float JumpingFalloff;
 
+    }
+
+    [Serializable]
+    public class CharacterStance
+    {
+        public float CameraHeight;
+        public CapsuleCollider StanceCollider; // link with a size appropriate Capsule Collider
     }
     #endregion
 
