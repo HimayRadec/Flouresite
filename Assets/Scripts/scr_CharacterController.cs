@@ -72,6 +72,9 @@ public class scr_CharacterController : MonoBehaviour
 
     private bool isSprinting;
 
+    private Vector3 newMovementSpeed;
+    private Vector3 newMovementSpeedVelocity;
+
 
     private void Awake()
     {
@@ -84,6 +87,7 @@ public class scr_CharacterController : MonoBehaviour
         defaultInput.Character.Crouch.performed += e => Crouch();
         defaultInput.Character.Prone.performed += e => Prone();
         defaultInput.Character.Sprint.performed += e => ToggleSprint();
+        defaultInput.Character.SprintReleased.performed += e => StopSprint();
 
         defaultInput.Enable();
 
@@ -118,11 +122,23 @@ public class scr_CharacterController : MonoBehaviour
     }
     private void CalculateMovement()
     {
-        var verticalSpeed = playerSettings.WalkingForwardSpeed * input_Movement.y * Time.deltaTime;
-        var horizonstalSpeed = playerSettings.WalkingStrafeSpeed * input_Movement.x * Time.deltaTime;
 
-        var newMovementSpeed = new Vector3(horizonstalSpeed, 0, verticalSpeed);
-        newMovementSpeed = transform.TransformDirection(newMovementSpeed); // Moves character according to camera direction   
+        if (input_Movement.y <= 0.2f)
+        {
+            isSprinting = false;
+        }
+
+        var verticalSpeed = playerSettings.WalkingForwardSpeed; // TODO: rename to forwardSpeed
+        var horizontalSpeed = playerSettings.WalkingStrafeSpeed; // TODO: rename to strafeSpeed
+
+        if (isSprinting)
+        {
+            verticalSpeed = playerSettings.RunningForwardSpeed;
+            horizontalSpeed = playerSettings.RunningStrafeSpeed;
+        }
+
+        newMovementSpeed = Vector3.SmoothDamp(newMovementSpeed, new Vector3(horizontalSpeed * input_Movement.x * Time.deltaTime, 0, verticalSpeed * input_Movement.y * Time.deltaTime), ref newMovementSpeedVelocity, playerSettings.MovementSmoothing);
+        var movementSpeed = transform.TransformDirection(newMovementSpeed); // Moves character according to camera direction   
 
 
         // Gravity
@@ -139,8 +155,8 @@ public class scr_CharacterController : MonoBehaviour
             playerGravity = -0.1f;
         }
 
-        newMovementSpeed.y += playerGravity;
-        newMovementSpeed += jumpingForce * Time.deltaTime;
+        movementSpeed.y += playerGravity;
+        movementSpeed += jumpingForce * Time.deltaTime;
 
 
         characterController.Move(newMovementSpeed);
@@ -228,8 +244,20 @@ public class scr_CharacterController : MonoBehaviour
     }
     private void ToggleSprint()
     {
+        if (input_Movement.y <= 0.2f)
+        {
+            isSprinting = false;
+        }
+
         isSprinting = !isSprinting;
 
+    }
+    private void StopSprint()
+    {
+        if (playerSettings.SprintingHold)
+        {
+            isSprinting = false;
+        }
     }
 }
 

@@ -26,7 +26,14 @@ public static class scr_Models
         public bool ViewXInverted;
         public bool ViewYInverted;
 
-        [Header("Movement")]
+        [Header("Movement Settings")]
+        public bool SprintingHold;
+        public float MovementSmoothing; // Transition between movements
+        [Header("Movement - Running")] // TODO: replace running with sprinting
+        public float RunningForwardSpeed;
+        public float RunningStrafeSpeed;
+
+        [Header("Movement - Walking")]
         public float WalkingForwardSpeed; // 8
         public float WalkingStrafeSpeed; // 5
         public float WalkingBackwardSpeed; // 4
