@@ -446,8 +446,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 984296e9c3463f849a517609336afcf8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  orientation: {fileID: 1509381327}
-  movementSpeed: 1
+  movementSpeed: 5
   movementVelocity: {x: 0, y: 0, z: 0}
 --- !u!114 &1509381326
 MonoBehaviour:
@@ -465,7 +464,7 @@ MonoBehaviour:
   xSensitivity: 50
   ySensitivity: 50
   xViewInverted: 0
-  yViewInverted: 0
+  yViewInverted: 1
   viewClampYMax: 80
   viewClampYMin: -70
 --- !u!4 &1509381327

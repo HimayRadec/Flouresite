@@ -13,12 +13,14 @@ public class scr_PlayerMovement : MonoBehaviour
     #region - Movement Values -
 
     [Header("Movement")]
-    public float movementSpeed; // Comes out to units per second
+    public float forwardSpeed = 6;
+    public float backwardSpeed = 3;
+    public float horizontalSpeed = 5;
     private Vector2 movementInput;
-    private Vector3 movementDirection;
-    public Vector3 movementVelocity;
+    private Vector3 movementVelocity;
 
     #endregion
+
 
     private void Awake()
     {
@@ -41,12 +43,26 @@ public class scr_PlayerMovement : MonoBehaviour
 
     private void CalculateMovement()
     {
+        // Calculate separate forward/backward and horizontal movements
+        Vector3 forwardMovement = transform.forward * movementInput.y;
+        Vector3 horizontalMovement = transform.right * movementInput.x;
 
-        movementDirection = new Vector3(movementInput.x, 0, movementInput.y);
+        // Apply different speeds for forward, backward, and horizontal movement
+        if (movementInput.y > 0)
+        {
+            forwardMovement *= forwardSpeed;
+        }
+        else
+        {
+            forwardMovement *= backwardSpeed;
+        }
+        horizontalMovement *= horizontalSpeed;
 
-        // Move relative to players view
-        movementVelocity = transform.TransformDirection(movementDirection) * movementSpeed / 100;
+        // Combine forward/backward and horizontal movement
+        movementVelocity = forwardMovement + horizontalMovement;
 
-        characterController.Move(movementVelocity);
+        // Move the character
+        characterController.Move(movementVelocity * Time.deltaTime);
     }
+
 }
