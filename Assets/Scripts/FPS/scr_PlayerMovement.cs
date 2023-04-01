@@ -19,20 +19,27 @@ public class scr_PlayerMovement : MonoBehaviour
     #region - Movement Values -
 
     [Header("Movement")]
-    public float forwardSpeed = 6;
-    public float backwardSpeed = 3;
-    public float horizontalSpeed = 5;
+    public float walkingForwardSpeed = 6;
+    public float walkingBackwardSpeed = 3;
+    public float walkingSidewaySpeed = 5;
+    
+    public float sprintingForwardSpeed = 10;
+    public float sprintingBackwardSpeed = 5;
+    public float sprintingSidewaySpeed = 7;
+
+    public bool isSprinting;
 
     private Vector2 movementInput;
     private Vector3 movementVelocity; // movement with direction
 
     [Header("Jump")]
-    public float jumpHeight;
+    public float jumpHeight = 1.5f;
     public float jumpSpeed = 1f;
     public float fallSpeed = 1f;
     public float gravity = -9.81f; // Gravity value, default is -9.81 (earth gravity)
     private float verticalVelocity; // Vertical velocity for jumping and gravity
     private bool isJumping;
+    private bool jumpPressed;
 
     #endregion
 
@@ -43,7 +50,12 @@ public class scr_PlayerMovement : MonoBehaviour
 
         input.Player.Move.performed += e => movementInput = e.ReadValue<Vector2>();
         input.Player.Move.canceled += e => movementInput = e.ReadValue<Vector2>();
-        input.Player.Jump.performed += e => Jump();
+
+        input.Player.Jump.performed += e => jumpPressed = true;
+        input.Player.Jump.canceled += e => jumpPressed = false;
+
+        input.Player.Sprinting.performed += e => isSprinting = true;
+        input.Player.Sprinting.canceled += e => isSprinting = false;
 
         input.Enable();
 
@@ -52,11 +64,15 @@ public class scr_PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // Debug.Log(movementDirection);
         CalculateMovement();
+        Jump();
     }
 
-
+    // TODO implement advanced jump
+    /// <summary>
+    /// calculates needed velocity to reach jumpHeight under earths gravity and returns time to reach
+    /// changes gravity and velocity needed to reach
+    /// </summary>
     private void CalculateMovement()
     {
         // Apply gravity
@@ -78,13 +94,13 @@ public class scr_PlayerMovement : MonoBehaviour
         // Apply different speeds for forward, backward, and horizontal movement
         if (movementInput.y > 0)
         {
-            forwardMovement *= forwardSpeed;
+            forwardMovement *= walkingForwardSpeed;
         }
         else
         {
-            forwardMovement *= backwardSpeed;
+            forwardMovement *= walkingBackwardSpeed;
         }
-        horizontalMovement *= horizontalSpeed;
+        horizontalMovement *= walkingSidewaySpeed;
 
         // Combine forward/backward and horizontal movement
         movementVelocity = forwardMovement + horizontalMovement;
@@ -95,11 +111,10 @@ public class scr_PlayerMovement : MonoBehaviour
         // Move the character
         characterController.Move(movementVelocity * Time.deltaTime);
     }
-
     private void Jump()
     {
         Debug.Log("Jump Pressed");
-        if (characterController.isGrounded)
+        if (characterController.isGrounded && jumpPressed)
         {
             isJumping = true;
             verticalVelocity = Mathf.Sqrt(-2 * gravity * jumpHeight) * jumpSpeed;
