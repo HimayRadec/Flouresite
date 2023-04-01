@@ -17,11 +17,11 @@ public class scr_PlayerLooking : MonoBehaviour
     public bool xViewInverted;
     public bool yViewInverted;
     public float viewClampYMax = 80;
-    public float viewClampYMin = -70f;
+    public float viewClampYMin = -70;
 
     private Vector2 lookInput;
     private Vector2 previousMousePosition;
-    private Vector3 cameraRotation;
+    private Vector3 cameraRotation; 
     private Vector3 characterRotation;
 
     private void Awake()
@@ -66,15 +66,14 @@ public class scr_PlayerLooking : MonoBehaviour
         // update previous mouse position
         previousMousePosition = currentMousePosition;
 
-        // Left and Right View
+        // rotates character left and right
         characterRotation.y += xSensitivity * (xViewInverted ? -lookInput.x : lookInput.x) * Time.deltaTime;
         transform.localRotation = Quaternion.Euler(characterRotation);
 
-        // Up and Down View
+        // rotates camera up and down
         cameraRotation.x += ySensitivity * (yViewInverted ? -lookInput.y : lookInput.y) * Time.deltaTime; // (If ? True : False)
         cameraRotation.x = Mathf.Clamp(cameraRotation.x, viewClampYMin, viewClampYMax);
 
         cameraHolder.localRotation = Quaternion.Euler(cameraRotation);
-        Debug.Log(lookInput);
     }
 }
