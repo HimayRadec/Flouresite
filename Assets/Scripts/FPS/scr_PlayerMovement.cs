@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -10,6 +11,12 @@ using UnityEngine.InputSystem;
 // Last Edit: April 1 2023
 // Requirements:
 // Runs off unity's input system. Class is called "PlayerInput"
+/// <summary>
+/// Naming conventions
+/// classes / methods - PascalCase
+/// variables - camelCase
+/// constants - CAPITAL
+/// </summary>
 
 public class scr_PlayerMovement : MonoBehaviour
 {
@@ -19,10 +26,18 @@ public class scr_PlayerMovement : MonoBehaviour
     #region - Movement Values -
 
     [Header("Movement")]
+    [SerializeField] private float forwardSpeed;
+    [SerializeField] private float backwardSpeed;
+    [SerializeField] private float sidewaySpeed;
+    [Space]
+    public float aimingForwardSpeed = 6;
+    public float aimingBackwardSpeed = 3;
+    public float aimingSidewaySpeed = 5;
+    [Space]
     public float walkingForwardSpeed = 6;
     public float walkingBackwardSpeed = 3;
     public float walkingSidewaySpeed = 5;
-    
+    [Space]
     public float sprintingForwardSpeed = 10;
     public float sprintingBackwardSpeed = 5;
     public float sprintingSidewaySpeed = 7;
@@ -42,6 +57,14 @@ public class scr_PlayerMovement : MonoBehaviour
     private bool jumpPressed;
 
     #endregion
+
+    public enum PlayerState
+    {
+        Aiming,
+        Walking,
+        Sprinting,
+        Jumping,
+    }
 
 
     private void Awake()
@@ -87,20 +110,40 @@ public class scr_PlayerMovement : MonoBehaviour
             verticalVelocity += gravity * speedMultiplier * Time.deltaTime;
         }
 
+        // TODO calculate PlayerState
+
+        // TODO get forward/backward/sideway speed based off player state speed.
+
         // Calculate separate forward/backward and horizontal movements
         Vector3 forwardMovement = transform.forward * movementInput.y;
         Vector3 horizontalMovement = transform.right * movementInput.x;
 
         // Apply different speeds for forward, backward, and horizontal movement
-        if (movementInput.y > 0)
+        // Check if player is sprinting and adjust speeds accordingly
+        if (isSprinting)
         {
-            forwardMovement *= walkingForwardSpeed;
+            if (movementInput.y > 0)
+            {
+                forwardMovement *= sprintingForwardSpeed;
+            }
+            else
+            {
+                forwardMovement *= sprintingBackwardSpeed;
+            }
+            horizontalMovement *= sprintingSidewaySpeed;
         }
         else
         {
-            forwardMovement *= walkingBackwardSpeed;
+            if (movementInput.y > 0)
+            {
+                forwardMovement *= walkingForwardSpeed;
+            }
+            else
+            {
+                forwardMovement *= walkingBackwardSpeed;
+            }
+            horizontalMovement *= walkingSidewaySpeed;
         }
-        horizontalMovement *= walkingSidewaySpeed;
 
         // Combine forward/backward and horizontal movement
         movementVelocity = forwardMovement + horizontalMovement;
@@ -111,6 +154,7 @@ public class scr_PlayerMovement : MonoBehaviour
         // Move the character
         characterController.Move(movementVelocity * Time.deltaTime);
     }
+
     private void Jump()
     {
         Debug.Log("Jump Pressed");
