@@ -41,8 +41,8 @@ public class scr_PlayerMovement : MonoBehaviour
     public float sprintingForwardSpeed = 10;
     public float sprintingBackwardSpeed = 5;
     public float sprintingSidewaySpeed = 7;
+    private bool sprintPressed;
 
-    public bool isSprinting;
 
     private Vector2 movementInput;
     private Vector3 movementVelocity; // movement with direction
@@ -53,8 +53,14 @@ public class scr_PlayerMovement : MonoBehaviour
     public float fallSpeed = 1f;
     public float gravity = -9.81f; // Gravity value, default is -9.81 (earth gravity)
     private float verticalVelocity; // Vertical velocity for jumping and gravity
-    private bool isJumping;
     private bool jumpPressed;
+
+    [Header("States")]
+    private bool isWalking;
+    public bool isSprinting;
+    private bool isJumping;
+
+
 
     #endregion
 
@@ -71,18 +77,26 @@ public class scr_PlayerMovement : MonoBehaviour
     {
         input = new PlayerInput();
 
-        input.Player.Move.performed += e => movementInput = e.ReadValue<Vector2>();
-        input.Player.Move.canceled += e => movementInput = e.ReadValue<Vector2>();
+        input.Player.Move.performed += ctx => movementInput = ctx.ReadValue<Vector2>();
+        input.Player.Move.canceled += ctx => movementInput = ctx.ReadValue<Vector2>();
 
-        input.Player.Jump.performed += e => jumpPressed = true;
-        input.Player.Jump.canceled += e => jumpPressed = false;
+        input.Player.Jump.performed += ctx => jumpPressed = ctx.ReadValueAsButton();
 
-        input.Player.Sprinting.performed += e => isSprinting = true;
-        input.Player.Sprinting.canceled += e => isSprinting = false;
+        input.Player.Sprinting.performed += ctx => isSprinting = ctx.ReadValueAsButton();
 
-        input.Enable();
 
         characterController = GetComponent<CharacterController>();
+    }
+
+    private void OnEnable()
+    {
+        input.Player.Enable();
+    }
+
+    private void OnDisable()
+    {
+        input.Player.Disable();
+
     }
 
     void Update()
@@ -157,7 +171,6 @@ public class scr_PlayerMovement : MonoBehaviour
 
     private void Jump()
     {
-        Debug.Log("Jump Pressed");
         if (characterController.isGrounded && jumpPressed)
         {
             isJumping = true;

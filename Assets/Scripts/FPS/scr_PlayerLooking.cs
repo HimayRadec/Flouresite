@@ -29,13 +29,24 @@ public class scr_PlayerLooking : MonoBehaviour
         input = new PlayerInput();
         Cursor.lockState = CursorLockMode.Locked;
 
-        input.Player.Look.performed += e => lookInput = e.ReadValue<Vector2>();
+        input.Player.Look.performed += ctx => lookInput = ctx.ReadValue<Vector2>();
 
         cameraRotation = cameraHolder.localRotation.eulerAngles;
         characterRotation = transform.localRotation.eulerAngles;
-        input.Enable();
 
         // previousMousePosition = Mouse.current.position.ReadValue();
+    }
+
+    private void OnEnable()
+    {
+        input.Player.Enable();
+
+    }
+
+    private void OnDisable()
+    {
+        input.Player.Disable();
+
     }
 
     void Start()
